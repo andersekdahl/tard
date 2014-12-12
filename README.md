@@ -30,3 +30,4 @@ tard
 ## What to build
 * Tetris game
 * Chat app
+* GIS/Wheather information app/service
