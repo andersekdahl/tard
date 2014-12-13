@@ -14,6 +14,7 @@ tard
 * Make
 * Gradle
 * Gulp
+* CMake
 
 ## Editors
 * vim
@@ -32,3 +33,5 @@ tard
 * Tetris game
 * Chat app (v2. Possibly with voice communication like Skype)
 * GIS/Wheather information app/service
+* Editor
+* Build system
