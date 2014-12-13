@@ -24,6 +24,8 @@ tard
 * Squeak 
 
 ## Other cool stuff
+* NoSQL databases
+* Meteor.js
 * Amazon deployment 
 * Xamarin
 * Kafka
