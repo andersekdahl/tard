@@ -30,5 +30,5 @@ tard
 
 ## What to build
 * Tetris game
-* Chat app
+* Chat app (v2. Possibly with voice communication like Skype)
 * GIS/Wheather information app/service
