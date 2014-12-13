@@ -9,6 +9,7 @@ tard
 * Prolog
 * Smalltalk
 * Swift
+* C
 
 ## Build tools
 * Make
