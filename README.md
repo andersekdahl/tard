@@ -23,6 +23,7 @@ tard
 
 ## Other cool stuff
 * Amazon deployment 
+* Xamarin
 * Kafka
 * Docker
 * Vagrant
