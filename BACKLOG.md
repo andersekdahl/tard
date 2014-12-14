@@ -17,3 +17,5 @@ Tard - backlog
 * Automatically reply to people with a bot using some simple AI
 * Each user has a profile and it should be possible to play tricks on your friends, like being able to draw on your friends profile or change profile picture. It shouldn't always be possible, you have to accomplish something before you can play with their profile.
 * At the of the year, it's time to vote for "tardo of the year", which is one of the users in a tard. The campaign starts in december and all votes should be registered before January. The results are announced at Jan 1, 00:00. Each tard member gets to write a promotional text about why they should win. Other ways of campaigning should also be possible.
+* Add your position/coordinates to items, friends/profiles, messages, places, pictures. Either manually or your current if possible.
+* Play simple games. Team against team or one on one. Real time and/or turn based.
