@@ -15,3 +15,4 @@ Tard - backlog
 * Nominate someone in the tard for a funny title and if more than half agree, the title is visible next to the username
 * Sign in with a Google or Facebook account
 * Automatically reply to people with a bot using some simple AI
+* Each user has a profile and it should be possible to play tricks on your friends, like being able to draw on your friends profile or change profile picture. It shouldn't always be possible, you have to accomplish something before you can play with their profile.
