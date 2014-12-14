@@ -4,6 +4,7 @@ tard
 ## Languages
 * Elm
 * Haskell
+* OCaml
 * Clojure
 * Common Lisp
 * Prolog
