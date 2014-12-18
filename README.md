@@ -1,6 +1,10 @@
 tard
 ===
 
+## Running ClojureScript/Om playground
+
+First you need `lein`. After you have that, all you need to to is `lein install` and then `lein cljsbuild once dev` which builds `app.js`. Then open `index.html` in a browser, and be a happy camper! You can then run `lein cljsbuild auto dev` which quickly builds `app.js` when you save `.cljs` files.
+
 ## Languages
 * Elm
 * Haskell
