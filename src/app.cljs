@@ -11,16 +11,33 @@
   (:import [goog History]
            [goog.history EventType]))
 
-(def app-state (atom {:todos []}))
+(enable-console-print!)
+
+(def app-state (atom {:todos [{:id 1 :text "Do stuff"} {:id 2 :text "Do more stuff"} {:id 3 :text "Do less stuff"}]}))
+
+(defn add-todo [app owner]
+  (let [new-field (om/get-node owner "new-todo")]
+    (do 
+      (om/transact! app :todos #(conj % {:id (rand-int 1000) :text (.-value new-field)}))
+      (println @app-state))))
 
 (defn cljslab-app [{:keys [todos] :as app} owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (let [comm (chan)]
+        (om/set-state! owner :comm comm)))
     om/IRender
-    (render [this]
+    (render [_]
       (html [:div "Hello world!"
-              [:ul (for [n (range 1 10)]
-                [:li {:key n} n])]
-              (html/submit-button {:on-click #(.alert js/window "I'm Reacting")} "React!")]))))
+              [:ul (for [todo todos]
+                [:li 
+                  {:key (:id todo)} 
+                  (:text todo)])]
+              [:input {:type "text" :ref "new-todo"}]
+              (html/submit-button 
+                {:on-click (partial add-todo app owner)} 
+                "React!")]))))
 
 (om/root cljslab-app app-state
   {:target (.querySelector js/document "body")})
