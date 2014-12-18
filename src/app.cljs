@@ -19,8 +19,8 @@
     (render [this]
       (html [:div "Hello world!"
               [:ul (for [n (range 1 10)]
-                [:li n])]
-              (html/submit-button "React!")]))))
+                [:li {:key n} n])]
+              (html/submit-button {:on-click #(.alert js/window "I'm Reacting")} "React!")]))))
 
 (om/root cljslab-app app-state
   {:target (.querySelector js/document "body")})
