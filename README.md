@@ -15,6 +15,7 @@ First you need `lein`. After you have that, all you need to to is `lein install`
 * Smalltalk
 * Swift
 * C
+* Ada
 
 ## Build tools
 * Make
