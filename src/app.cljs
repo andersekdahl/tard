@@ -23,10 +23,6 @@
 
 (defn cljslab-app [{:keys [todos] :as app} owner]
   (reify
-    om/IWillMount
-    (will-mount [_]
-      (let [comm (chan)]
-        (om/set-state! owner :comm comm)))
     om/IRender
     (render [_]
       (html [:div "Hello world!"
