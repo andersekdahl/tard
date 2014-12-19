@@ -13,7 +13,7 @@
 
 (enable-console-print!)
 
-(def app-state (atom {:dragging nil :todos [{:id 1 :text "Do stuff"} {:id 2 :text "Do more stuff"} {:id 3 :text "Do less stuff"}]}))
+(def app-state (atom {:dragging nil :todos [{:id 1 :text "Do stuff" :checked false} {:id 2 :text "Do more stuff" :checked false} {:id 3 :text "Do less stuff" :checked false}]}))
 
 (defn add-todo [app owner]
   (let [new-field (om/get-node owner "new-todo")]
@@ -21,13 +21,25 @@
       (om/transact! app :todos #(conj % {:id (rand-int 1000) :text (.-value new-field)}))
       (set! (.-value new-field) ""))))
 
+(defn update-todo-checked [todo]
+  (do
+    (let [updated-todo (assoc todo :checked (not (get :checked todo)))
+          todos (:todos @app-state)
+          checked (not (:checked todo))]
+      (let [updated-todos (vec (map #(if (= (:id %) (:id todo))
+             (assoc % :checked checked)
+             %) todos))]
+       (swap! app-state assoc :todos updated-todos)
+        (println app-state)))))
+
+
 (defn todo-drop [app e]
   (let [todo (:dragging @app-state)]
     ;; TODO: Insert the todo in the right place, don't just place it last
     (om/transact! app :todos (fn [xs] (conj (vec (remove #(= todo %) xs)) todo)))
     (swap! app-state assoc :dragging nil)))
 
-(defn todo-drag-start 
+(defn todo-drag-start
   "Take the todo data and serialize, and attach it to the drag event"
   [dragged-todo e]
   ;; This is only needed to make Firefox show the dragging element,
@@ -39,11 +51,12 @@
   (reify
     om/IRenderState
     (render-state [this {:keys [delete]}]
-      (html [:li 
-             {:draggable true 
+      (html [:li
+             {:draggable true
               :on-drag-start (partial todo-drag-start todo)}
              (:text todo) " "
-            [:input {:type "button" :on-click #(put! delete @todo) :value "Delete"}]]))))
+             [:input {:type "button" :on-click #(put! delete @todo) :value "Delete"}]
+             [:input {:type "checkbox" :on-click #(update-todo-checked @todo)}]]))))
 
 (defn todos-view [app owner]
   (reify
@@ -60,10 +73,10 @@
             (recur))))))
     om/IRenderState
     (render-state [this {:keys [delete]}]
-      (html [:div {:on-drop #(todo-drop app %) 
+      (html [:div {:on-drop #(todo-drop app %)
                    ;; preventDefault is needed because otherwise we don't get
                    ;; the drop event
-                   :on-drag-enter #(.preventDefault %) 
+                   :on-drag-enter #(.preventDefault %)
                    :on-drag-over #(.preventDefault %)}
               [:h2 "Todo list"]
               [:ul
