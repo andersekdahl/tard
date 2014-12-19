@@ -19,6 +19,7 @@
   (let [new-field (om/get-node owner "new-todo")]
     (do
       (om/transact! app :todos #(conj % {:id (rand-int 1000) :text (.-value new-field)}))
+      (set! (.-value new-field) "")
       (println @app-state))))
 
 (defn todo-view [todo owner]
