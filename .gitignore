@@ -2,3 +2,5 @@ out
 target
 app.js
 pom.xml
+/#app.js#
+/src/#app.cljs#
