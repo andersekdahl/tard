@@ -28,22 +28,20 @@
           todos (:todos @app-state)
           checked (not (:checked todo))]
       (let [updated-todos (vec (map #(if (= (:id %) (:id todo))
-             (assoc % :checked checked)
-             %) todos))]
-       (swap! app-state assoc :todos updated-todos)
-        (println app-state)))))
+                                       (assoc % :checked checked)
+                                       %) todos))]
+        (swap! app-state assoc :todos updated-todos)))))
 
 (defn show-checked [app owner]
-  (do
     (let [checked (:show-checked @app)]
-      (om/transact! app :show-checked #(not checked)))
-    (println app-state)))
+      (om/transact! app :show-checked #(not checked))))
    
 (defn todo-drop [app e]
   (let [todo (:dragging @app-state)]
     ;; TODO: Insert the todo in the right place, don't just place it last
     (om/transact! app :todos (fn [xs] (conj (vec (remove #(= todo %) xs)) todo)))
     (swap! app-state assoc :dragging nil)))
+
 
 (defn todo-drag-start
   "Take the todo data and serialize, and attach it to the drag event"
@@ -55,18 +53,15 @@
 
 (defn todo-view [todo owner]
   ;;The hidden bool should trigger if a todo should be hidden or not. Works in some cases. Fix me please :)
-  (let [hidden  (and (:checked todo) (not (:show-checked @app-state)))]
-    (println hidden)
     (reify
       om/IRenderState
       (render-state [this {:keys [delete]}]
         (html [:li
                {:draggable true
-                :hidden hidden
                 :on-drag-start (partial todo-drag-start todo)}
                (:text todo) " "
                [:input {:type "button" :on-click #(put! delete @todo) :value "Delete"}]
-               [:input {:type "checkbox" :on-click #(update-todo-checked @todo)}]])))))
+               [:input {:type "checkbox" :checked (:checked todo) :on-click #(update-todo-checked @todo)}]]))))
 
 (defn todos-view [app owner]
   (reify
@@ -83,19 +78,25 @@
             (recur))))))
     om/IRenderState
     (render-state [this {:keys [delete]}]
-      (html [:div {:on-drop #(todo-drop app %)
-                   ;; preventDefault is needed because otherwise we don't get
-                   ;; the drop event
-                   :on-drag-enter #(.preventDefault %)
-                   :on-drag-over #(.preventDefault %)}
+       (html [:div {:on-drop #(todo-drop app %)
+                    ;; preventDefault is needed because otherwise we don't get
+                    ;; the drop event
+                    :on-drag-enter #(.preventDefault %)
+                    :on-drag-over #(.preventDefault %)}
               [:h2 "Todo list"]
-             [:input {:type "checkbox" :on-click #(show-checked app owner)}]
+              [:input {:type "checkbox" :on-click #(show-checked app owner)}]
               [:ul
-                (om/build-all todo-view (:todos app)
-                  {:init-state {:delete delete} :key :id})]
-              [:div
-                [:input {:type "text" :ref "new-todo"}]
-                [:input {:type "button" :on-click #(add-todo app owner) :value "Add"}]]]))))
+             
+              (let [filtered-todos  (vec (filter (fn [td]
+                                          (if (:show-checked app)
+                                            true
+                                            (not (:checked td)))) (:todos app)))]
+                (om/build-all todo-view filtered-todos
+                              {:init-state {:delete delete} :key :id}))
+                 [:div
+                  [:input {:type "text" :ref "new-todo"}]
+                  [:input {:type "button" :on-click #(add-todo app owner) :value "Add"}]]]]))))
 
 (om/root todos-view app-state
   {:target (.querySelector js/document "body")})
+
