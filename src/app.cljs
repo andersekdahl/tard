@@ -63,11 +63,21 @@
                [:input {:type "button" :on-click #(put! delete @todo) :value "Delete"}]
                [:input {:type "checkbox" :checked (:checked todo) :on-click #(update-todo-checked @todo)}]]))))
 
+(defn search-todo [owner text]
+  (om/set-state! owner :search-string text))
+
+(defn filter-todos [show-checked search-string todos]
+  (filter #(not= (.indexOf (:text %) search-string) -1)
+    (filter (fn [td]
+      (if show-checked
+       true
+       (not (:checked td)))) todos)))
+
 (defn todos-view [app owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:delete (chan)})
+      {:delete (chan) :search-string ""})
     om/IWillMount
     (will-mount [_]
       (let [delete (om/get-state owner :delete)]
@@ -77,7 +87,7 @@
               (fn [xs] (vec (remove #(= todo %) xs))))
             (recur))))))
     om/IRenderState
-    (render-state [this {:keys [delete]}]
+    (render-state [this {:keys [delete search-string]}]
        (html [:div {:on-drop #(todo-drop app %)
                     ;; preventDefault is needed because otherwise we don't get
                     ;; the drop event
@@ -87,15 +97,18 @@
               [:input {:type "checkbox" :on-click #(show-checked app owner)}]
               [:ul
              
-              (let [filtered-todos  (vec (filter (fn [td]
-                                          (if (:show-checked app)
-                                            true
-                                            (not (:checked td)))) (:todos app)))]
+              (let [filtered-todos (filter-todos (:show-checked app) search-string (:todos app))]
                 (om/build-all todo-view filtered-todos
                               {:init-state {:delete delete} :key :id}))
                  [:div
                   [:input {:type "text" :ref "new-todo"}]
-                  [:input {:type "button" :on-click #(add-todo app owner) :value "Add"}]]]]))))
+                  [:input {:type "button" :on-click #(add-todo app owner) :value "Add"}]]
+                 [:div
+                  [:input 
+                    {:type "text" 
+                     :ref "search-field"
+                     :placeholder "Search" 
+                     :on-key-up #(search-todo owner (.-value (om/get-node owner "search-field")))}]]]]))))
 
 (om/root todos-view app-state
   {:target (.querySelector js/document "body")})
