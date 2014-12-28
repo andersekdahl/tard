@@ -13,12 +13,12 @@
 
 (enable-console-print!)
 
-(def app-state (atom {:show-checked false :dragging nil :todos [{:id 1 :text "Do stuff" :checked false} {:id 2 :text "Do more stuff" :checked false} {:id 3 :text "Do less stuff" :checked false}]}))
+(def app-state (atom {:show-checked false :dragging nil :todos [{:id 1 :text "Do stuff" :checked false :editing false} {:id 2 :text "Do more stuff" :checked false :editing false} {:id 3 :text "Do less stuff" :checked false :editing false}]}))
 
 (defn add-todo [app owner]
   (let [new-field (om/get-node owner "new-todo")]
     (do
-      (om/transact! app :todos #(conj % {:id (rand-int 1000) :text (.-value new-field)}))
+      (om/transact! app :todos #(conj % {:id (rand-int 1000) :text (.-value new-field) :checked false :editing false}))
       (set! (.-value new-field) ""))))
 
 ;;Left the println for debugging purpose.
@@ -51,6 +51,14 @@
   (.nativeEvent.dataTransfer.setData e "text/plain" (:id @dragged-todo))
   (swap! app-state assoc :dragging @dragged-todo))
 
+(defn edit-todo [todo]
+  (om/update! todo :editing (not (:editing @todo)))
+  (println app-state))
+
+(defn update-todo [todo text]
+  (om/update! todo :text text)
+  (om/update! todo :editing false))
+
 (defn todo-view [todo owner]
   ;;The hidden bool should trigger if a todo should be hidden or not. Works in some cases. Fix me please :)
     (reify
@@ -59,7 +67,14 @@
         (html [:li
                {:draggable true
                 :on-drag-start (partial todo-drag-start todo)}
-               (:text todo) " "
+               (if (= (:editing todo) false)
+                [:span 
+                  (:text todo)
+                  [:input {:type "button" :on-click #(edit-todo todo) :value "Edit"}]]
+                [:span
+                  [:input {:type "text" :defaultValue (:text todo) :ref "edit-field"}]
+                  [:input {:type "button" :on-click #(update-todo todo (.-value (om/get-node owner "edit-field"))) :value "Done"}]]) 
+               " "
                [:input {:type "button" :on-click #(put! delete @todo) :value "Delete"}]
                [:input {:type "checkbox" :checked (:checked todo) :on-click #(update-todo-checked @todo)}]]))))
 
