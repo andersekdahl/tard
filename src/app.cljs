@@ -23,14 +23,7 @@
 
 ;;Left the println for debugging purpose.
 (defn update-todo-checked [todo]
-  (do
-    (let [updated-todo (assoc todo :checked (not (get :checked todo)))
-          todos (:todos @app-state)
-          checked (not (:checked todo))]
-      (let [updated-todos (vec (map #(if (= (:id %) (:id todo))
-                                       (assoc % :checked checked)
-                                       %) todos))]
-        (swap! app-state assoc :todos updated-todos)))))
+  (om/update! todo :checked (not (:checked @todo))))
 
 (defn show-checked [app owner]
     (let [checked (:show-checked @app)]
@@ -76,7 +69,7 @@
                   [:input {:type "button" :on-click #(update-todo todo (.-value (om/get-node owner "edit-field"))) :value "Done"}]]) 
                " "
                [:input {:type "button" :on-click #(put! delete @todo) :value "Delete"}]
-               [:input {:type "checkbox" :checked (:checked todo) :on-click #(update-todo-checked @todo)}]]))))
+               [:input {:type "checkbox" :checked (:checked todo) :on-click #(update-todo-checked todo)}]]))))
 
 (defn search-todo [owner text]
   (om/set-state! owner :search-string text))
