@@ -23,19 +23,17 @@
       (set! (.-value new-field) "")
        (set! (.-value new-tag) ""))))
 
-;;Left the println for debugging purpose.
 (defn update-todo-checked [todo]
   (om/update! todo :checked (not (:checked @todo))))
 
 (defn show-checked [app owner]
-    (let [checked (:show-checked @app)]
-      (om/transact! app :show-checked #(not checked))))
+  (om/update! app :show-checked (not (:show-checked @app))))
    
 (defn todo-drop [app e]
   (let [todo (:dragging @app-state)]
     ;; TODO: Insert the todo in the right place, don't just place it last
     (om/transact! app :todos (fn [xs] (conj (vec (remove #(= todo %) xs)) todo)))
-    (swap! app-state assoc :dragging nil)))
+    (om/update! app :dragging nil)))
 
 
 (defn todo-drag-start
@@ -77,12 +75,22 @@
 (defn search-todo [owner text]
   (om/set-state! owner :search-string text))
 
+(defn todo-matches-search? [todo search-string]
+  (not= (.indexOf (:text todo) search-string) -1))
+
 (defn filter-todos [show-checked search-string todos]
+<<<<<<< HEAD
   (filter #(or (not=(.indexOf (:text %) search-string) -1) (not= (.indexOf (:tag %) search-string) -1))
     (filter (fn [td]
       (if show-checked
        true
        (not (:checked td)))) todos)))
+=======
+  (filter (fn [td]
+            (if show-checked
+             (todo-matches-search? td search-string)
+             (and (not (:checked td)) (todo-matches-search? td search-string)))) todos))
+>>>>>>> a297b70107b1185039caefbfeccd6b2136819bbc
 
 (defn todos-view [app owner]
   (reify
