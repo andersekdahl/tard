@@ -74,12 +74,14 @@
 (defn search-todo [owner text]
   (om/set-state! owner :search-string text))
 
+(defn todo-matches-search? [todo search-string]
+  (not= (.indexOf (:text todo) search-string) -1))
+
 (defn filter-todos [show-checked search-string todos]
-  (filter #(not= (.indexOf (:text %) search-string) -1)
-    (filter (fn [td]
-      (if show-checked
-       true
-       (not (:checked td)))) todos)))
+  (filter (fn [td]
+            (if show-checked
+             (todo-matches-search? td search-string)
+             (and (not (:checked td)) (todo-matches-search? td search-string)))) todos))
 
 (defn todos-view [app owner]
   (reify
