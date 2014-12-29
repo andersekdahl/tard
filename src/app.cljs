@@ -33,7 +33,7 @@
   (let [todo (:dragging @app-state)]
     ;; TODO: Insert the todo in the right place, don't just place it last
     (om/transact! app :todos (fn [xs] (conj (vec (remove #(= todo %) xs)) todo)))
-    (swap! app-state assoc :dragging nil)))
+    (om/update! app :dragging nil)))
 
 
 (defn todo-drag-start
