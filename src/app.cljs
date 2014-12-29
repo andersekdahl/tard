@@ -13,13 +13,15 @@
 
 (enable-console-print!)
 
-(def app-state (atom {:show-checked false :dragging nil :todos [{:id 1 :text "Do stuff" :checked false :editing false} {:id 2 :text "Do more stuff" :checked false :editing false} {:id 3 :text "Do less stuff" :checked false :editing false}]}))
+(def app-state (atom {:show-checked false :dragging nil :todos [{:id 1 :text "Do stuff" :checked false :editing false :tag ""} {:id 2 :text "Do more stuff" :checked false :editing false :tag "Job related"} {:id 3 :text "Do less stuff" :checked false :editing false :tag ""}]}))
 
 (defn add-todo [app owner]
-  (let [new-field (om/get-node owner "new-todo")]
+  (let [new-field (om/get-node owner "new-todo")
+        new-tag (om/get-node owner "new-todo-tag")]
     (do
-      (om/transact! app :todos #(conj % {:id (rand-int 1000) :text (.-value new-field) :checked false :editing false}))
-      (set! (.-value new-field) ""))))
+      (om/transact! app :todos #(conj % {:id (rand-int 1000) :text (.-value new-field) :checked false :editing false :tag (.-value new-tag)}))
+      (set! (.-value new-field) "")
+       (set! (.-value new-tag) ""))))
 
 ;;Left the println for debugging purpose.
 (defn update-todo-checked [todo]
@@ -69,13 +71,14 @@
                   [:input {:type "button" :on-click #(update-todo todo (.-value (om/get-node owner "edit-field"))) :value "Done"}]]) 
                " "
                [:input {:type "button" :on-click #(put! delete @todo) :value "Delete"}]
-               [:input {:type "checkbox" :checked (:checked todo) :on-click #(update-todo-checked todo)}]]))))
+               [:input {:type "checkbox" :checked (:checked todo) :on-click #(update-todo-checked todo)}]
+               [:text (:tag todo)]]))))
 
 (defn search-todo [owner text]
   (om/set-state! owner :search-string text))
 
 (defn filter-todos [show-checked search-string todos]
-  (filter #(not= (.indexOf (:text %) search-string) -1)
+  (filter #(or (not=(.indexOf (:text %) search-string) -1) (not= (.indexOf (:tag %) search-string) -1))
     (filter (fn [td]
       (if show-checked
        true
@@ -110,6 +113,7 @@
                               {:init-state {:delete delete} :key :id}))
                  [:div
                   [:input {:type "text" :ref "new-todo"}]
+                  [:input {:type "text" :ref "new-todo-tag"}]
                   [:input {:type "button" :on-click #(add-todo app owner) :value "Add"}]]
                  [:div
                   [:input 
