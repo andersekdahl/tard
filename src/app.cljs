@@ -21,13 +21,11 @@
       (om/transact! app :todos #(conj % {:id (rand-int 1000) :text (.-value new-field) :checked false :editing false}))
       (set! (.-value new-field) ""))))
 
-;;Left the println for debugging purpose.
 (defn update-todo-checked [todo]
   (om/update! todo :checked (not (:checked @todo))))
 
 (defn show-checked [app owner]
-    (let [checked (:show-checked @app)]
-      (om/transact! app :show-checked #(not checked))))
+  (om/update! app :show-checked (not (:show-checked @app))))
    
 (defn todo-drop [app e]
   (let [todo (:dragging @app-state)]
