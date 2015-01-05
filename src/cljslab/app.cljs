@@ -1,6 +1,7 @@
 (ns cljslab.app
   (:require-macros [cljs.core.async.macros :refer [go]]
-                   [secretary.macros :refer [defroute]])
+                   [secretary.macros :refer [defroute]]
+                   [cljslab.macros :refer [mekk]])
   (:require [goog.events :as events]
             [sablono.core :as html :refer-macros [html]]
             [cljs.core.async :refer [put! <! chan]]
@@ -12,6 +13,8 @@
            [goog.history EventType]))
 
 (enable-console-print!)
+
+(mekk)
 
 (def app-state (atom {:show-checked false :dragging nil :todos [{:id 1 :text "Do stuff" :checked false :editing false :tag ""} {:id 2 :text "Do more stuff" :checked false :editing false :tag "Job related"} {:id 3 :text "Do less stuff" :checked false :editing false :tag ""}]}))
 
