@@ -4,3 +4,4 @@ app.js
 pom.xml
 /#app.js#
 /src/#app.cljs#
+/.lein-repl-history
